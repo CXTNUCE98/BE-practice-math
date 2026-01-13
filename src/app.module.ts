@@ -6,6 +6,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { ExamModule } from './exam/exam.module';
 
+import { UserModule } from './user/user.module';
+
 /**
  * Module gốc của ứng dụng, kết nối tất cả các thành phần lại với nhau
  */
@@ -17,6 +19,7 @@ import { ExamModule } from './exam/exam.module';
     PrismaModule,
     AuthModule,
     ExamModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

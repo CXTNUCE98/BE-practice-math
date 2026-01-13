@@ -11,6 +11,7 @@ import {
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { UserResponseDto } from './dto/user-response.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import type { AuthenticatedRequest } from '../common/interfaces/request.interface';
 import {
@@ -65,10 +66,14 @@ export class AuthController {
   @Get('me')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Lấy thông tin cá nhân của người dùng hiện tại' })
-  @ApiResponse({ status: 200, description: 'Thông tin người dùng' })
+  @ApiResponse({
+    status: 200,
+    description: 'Thông tin người dùng',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
   @UseGuards(JwtAuthGuard)
-  async getMe(@Req() req: AuthenticatedRequest): Promise<any> {
+  async getMe(@Req() req: AuthenticatedRequest): Promise<UserResponseDto> {
     return this.authService.getMe(req.user.userId);
   }
 }
