@@ -25,24 +25,18 @@ export function setupApp(app: INestApplication) {
 
   const document = SwaggerModule.createDocument(app, config);
 
-  // Cấu hình thủ công để serve static files cho Swagger UI (Fix 404 on Vercel)
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const swaggerUiAssetPath = require('swagger-ui-dist').getAbsoluteFSPath();
   const expressApp = app.getHttpAdapter().getInstance() as Application;
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const express = require('express');
 
-  // Mount assets tại đường dẫn riêng biệt (root level) để tránh lỗi relative path (/api/api/...)
-  expressApp.use('/swagger-static', express.static(swaggerUiAssetPath));
-
-  // Setup Swagger UI sử dụng các file từ đường dẫn static vừa tạo
+  // Setup Swagger UI sử dụng CDN (cdnjs) để đảm bảo load resources ổn định trên Vercel
   SwaggerModule.setup('api', app, document, {
     customSiteTitle: 'Practice Math API Docs',
     customJs: [
-      '/swagger-static/swagger-ui-bundle.js',
-      '/swagger-static/swagger-ui-standalone-preset.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.min.js',
     ],
-    customCssUrl: ['/swagger-static/swagger-ui.css'],
+    customCssUrl: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css',
+    ],
   });
 
   // Endpoint Swagger JSON
