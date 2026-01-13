@@ -25,18 +25,20 @@ export function setupApp(app: INestApplication) {
 
   const document = SwaggerModule.createDocument(app, config);
 
-  // Setup Swagger UI với CDN để tránh lỗi 404 static files trên Vercel
+  // Cấu hình thủ công để serve static files cho Swagger UI (Fix 404 on Vercel)
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const swaggerUiAssetPath = require('swagger-ui-dist').getAbsoluteFSPath();
+  const expressApp = app.getHttpAdapter().getInstance() as Application;
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const express = require('express');
+  expressApp.use('/api', express.static(swaggerUiAssetPath));
+
+  // Setup Swagger UI
   SwaggerModule.setup('api', app, document, {
     customSiteTitle: 'Practice Math API Docs',
-    customJs: [
-      'https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js',
-      'https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js',
-    ],
-    customCssUrl: ['https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css'],
   });
 
   // Endpoint Swagger JSON
-  const expressApp = app.getHttpAdapter().getInstance() as Application;
   expressApp.get('/api-docs-json', (req: Request, res: Response) => {
     res.json(document);
   });
