@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-3.0.x", "debian-openssl-1.1.x"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+  binaryTargets   = ["native", "rhel-openssl-3.0.x", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -21,6 +22,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   results   Result[]
+  @@map("users")
 }
 
 model Exam {
@@ -32,6 +34,7 @@ model Exam {
   updatedAt   DateTime   @updatedAt
   questions   Question[]
   results     Result[]
+  @@map("exams")
 }
 
 model Question {
@@ -42,6 +45,7 @@ model Question {
   explanation   String?
   examId        String
   exam          Exam     @relation(fields: [examId], references: [id])
+  @@map("questions")
 }
 
 model Result {
@@ -54,4 +58,5 @@ model Result {
   submittedAt DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id])
   exam        Exam     @relation(fields: [examId], references: [id])
+  @@map("results")
 }
