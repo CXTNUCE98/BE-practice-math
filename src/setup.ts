@@ -31,11 +31,18 @@ export function setupApp(app: INestApplication) {
   const expressApp = app.getHttpAdapter().getInstance() as Application;
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const express = require('express');
-  expressApp.use('/api', express.static(swaggerUiAssetPath));
 
-  // Setup Swagger UI
+  // Mount assets tại đường dẫn riêng biệt (root level) để tránh lỗi relative path (/api/api/...)
+  expressApp.use('/swagger-static', express.static(swaggerUiAssetPath));
+
+  // Setup Swagger UI sử dụng các file từ đường dẫn static vừa tạo
   SwaggerModule.setup('api', app, document, {
     customSiteTitle: 'Practice Math API Docs',
+    customJs: [
+      '/swagger-static/swagger-ui-bundle.js',
+      '/swagger-static/swagger-ui-standalone-preset.js',
+    ],
+    customCssUrl: ['/swagger-static/swagger-ui.css'],
   });
 
   // Endpoint Swagger JSON
