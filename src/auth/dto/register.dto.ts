@@ -1,4 +1,10 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
@@ -30,4 +36,14 @@ export class RegisterDto {
   @IsString({ message: 'Họ và tên phải là chuỗi' })
   @IsNotEmpty({ message: 'Họ và tên không được để trống' })
   fullName: string;
+
+  @ApiProperty({
+    description: 'Lớp học của người dùng (Tùy chọn)',
+    example: 'Lớp 12A1',
+    required: false,
+  })
+  @IsString({ message: 'Lớp phải là chuỗi' })
+  @IsNotEmpty({ message: 'Lớp không được để trống' })
+  @IsOptional()
+  className?: string;
 }

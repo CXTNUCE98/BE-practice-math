@@ -26,7 +26,7 @@ export class AuthService {
    * Đăng ký người dùng mới
    */
   async register(registerDto: RegisterDto): Promise<{ message: string }> {
-    const { email, password, fullName } = registerDto;
+    const { email, password, fullName, className } = registerDto;
 
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
@@ -42,6 +42,7 @@ export class AuthService {
         email,
         password: hashedPassword,
         fullName,
+        className,
       },
     });
 
@@ -80,6 +81,7 @@ export class AuthService {
         id: true,
         email: true,
         fullName: true,
+        className: true,
         role: true,
       },
     });

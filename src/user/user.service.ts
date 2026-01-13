@@ -1,5 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
+import { UpdateProfileDto, ChangePasswordDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -53,6 +59,58 @@ export class UserService {
         },
       },
       orderBy: { startedAt: 'desc' },
+    });
+  }
+  /**
+   * Cập nhật thông tin cá nhân
+   */
+  async updateProfile(
+    userId: string,
+    updateProfileDto: UpdateProfileDto,
+  ): Promise<any> {
+    const { fullName, className } = updateProfileDto;
+
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        fullName,
+        className,
+      },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        className: true,
+        role: true,
+      },
+    });
+
+    return user;
+  }
+
+  /**
+   * Đổi mật khẩu
+   */
+  async changePassword(
+    userId: string,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<void> {
+    const { oldPassword, newPassword } = changePasswordDto;
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isPasswordValid) {
+      throw new BadRequestException('Mật khẩu cũ không chính xác');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
     });
   }
 }
