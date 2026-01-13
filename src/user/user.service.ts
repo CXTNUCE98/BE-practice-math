@@ -68,13 +68,14 @@ export class UserService {
     userId: string,
     updateProfileDto: UpdateProfileDto,
   ): Promise<any> {
-    const { fullName, className } = updateProfileDto;
+    const { fullName, className, role } = updateProfileDto;
 
     const user = await this.prisma.user.update({
       where: { id: userId },
       data: {
         fullName,
         className,
+        role: role as any, // Cast to any or import Role enum from client if strict
       },
       select: {
         id: true,

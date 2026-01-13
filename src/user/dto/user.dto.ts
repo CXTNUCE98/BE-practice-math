@@ -24,6 +24,16 @@ export class UpdateProfileDto {
   @IsNotEmpty({ message: 'Lớp không được để trống' })
   @IsOptional()
   className?: string;
+
+  @ApiProperty({
+    description: 'Vai trò người dùng',
+    example: 'USER',
+    required: false,
+    enum: ['ADMIN', 'USER'],
+  })
+  @IsString({ message: 'Role phải là chuỗi' })
+  @IsOptional()
+  role?: 'ADMIN' | 'USER';
 }
 
 /**
