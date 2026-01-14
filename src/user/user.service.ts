@@ -21,10 +21,22 @@ export class UserService {
         id: true,
         email: true,
         fullName: true,
+        className: true,
         role: true,
         createdAt: true,
         _count: {
           select: { results: true },
+        },
+        results: {
+          take: 1,
+          orderBy: { startedAt: 'desc' },
+          select: {
+            score: true,
+            startedAt: true,
+            exam: {
+              select: { title: true },
+            },
+          },
         },
       },
     });
@@ -32,6 +44,7 @@ export class UserService {
     return users.map((user) => ({
       ...user,
       examCount: user._count.results,
+      latestResult: user.results[0] || null,
     }));
   }
 
