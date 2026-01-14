@@ -14,7 +14,6 @@
     "test": "jest",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "postinstall": "prisma generate",
     "vercel-build": "sh scripts/vercel-build.sh"
   },
   "dependencies": {
