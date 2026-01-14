@@ -140,6 +140,20 @@ export class ExamController {
   }
 
   /**
+   * Lấy chi tiết kết quả bài thi
+   */
+  @Get('results/:id')
+  @ApiOperation({ summary: 'Xem chi tiết kết quả bài đã làm' })
+  @ApiResponse({ status: 200, description: 'Chi tiết kết quả bài thi' })
+  @UseGuards(JwtAuthGuard)
+  async getResult(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') resultId: string,
+  ): Promise<any> {
+    return this.examService.getResult(resultId, req.user.userId);
+  }
+
+  /**
    * Debug endpoint to check latest exam
    */
   @Get('debug/latest')

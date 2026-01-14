@@ -102,8 +102,34 @@ export class ExamService {
     return this.prisma.result.findMany({
       where: { userId },
       include: { exam: true },
-      orderBy: { startedAt: 'desc' },
+      orderBy: { submittedAt: 'desc' },
     });
+  }
+
+  /**
+   * Lấy chi tiết một kết quả thi kèm theo đề bài và câu hỏi
+   */
+  async getResult(id: string, userId: string): Promise<any> {
+    const result = await this.prisma.result.findUnique({
+      where: { id },
+      include: {
+        exam: {
+          include: {
+            questions: true,
+          },
+        },
+      },
+    });
+
+    if (!result) {
+      throw new NotFoundException('Không tìm thấy kết quả bài thi');
+    }
+
+    if (result.userId !== userId) {
+      throw new NotFoundException('Bạn không có quyền xem kết quả này');
+    }
+
+    return result;
   }
 
   /**
