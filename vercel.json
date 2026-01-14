@@ -1,19 +1,8 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "dist/vercel.js",
-      "use": "@vercel/node"
+      "source": "/(.*)",
+      "destination": "/api"
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "dist/vercel.js"
-    }
-  ],
-  "regions": ["hkg1"],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
