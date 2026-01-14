@@ -45,7 +45,7 @@ model Question {
   correctAnswer Int      // Index 0-3
   explanation   String?
   examId        String
-  exam          Exam     @relation(fields: [examId], references: [id])
+  exam          Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
   @@map("questions")
 }
 
@@ -58,6 +58,6 @@ model Result {
   startedAt   DateTime @default(now())
   submittedAt DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id])
-  exam        Exam     @relation(fields: [examId], references: [id])
+  exam        Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
   @@map("results")
 }
