@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Param,
+  Delete,
   UseInterceptors,
   UploadedFile,
   Body,
@@ -156,5 +157,17 @@ export class ExamController {
       questionCount: full.questions?.length || 0,
       sampleQuestion: full.questions?.[0] || null,
     };
+  }
+
+  /**
+   * Xóa đề thi (Chỉ dành cho Admin)
+   */
+  @Delete(':id')
+  @ApiOperation({ summary: 'Xóa đề thi' })
+  @ApiResponse({ status: 200, description: 'Đề thi đã được xóa' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  async deleteExam(@Param('id') id: string): Promise<any> {
+    return this.examService.remove(id);
   }
 }

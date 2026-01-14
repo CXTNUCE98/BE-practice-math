@@ -105,4 +105,14 @@ export class ExamService {
       orderBy: { startedAt: 'desc' },
     });
   }
+
+  /**
+   * Xóa đề thi
+   */
+  async remove(id: string): Promise<any> {
+    await this.findOne(id);
+    return this.prisma.exam.delete({
+      where: { id },
+    });
+  }
 }
