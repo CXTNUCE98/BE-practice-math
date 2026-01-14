@@ -57,6 +57,22 @@ export class ParserService {
       const questions = this.extractQuestionsFromHtml(html);
       console.log(`[PANDOC] Extracted ${questions.length} questions`);
 
+      // Bước 4: Trích xuất bảng đáp án
+      const answerKey = this.extractAnswersFromHtml(html);
+      console.log(
+        `[PANDOC] Extracted ${Object.keys(answerKey).length} answers from key`,
+      );
+
+      // Bước 5: Map đáp án vào câu hỏi
+      if (Object.keys(answerKey).length > 0) {
+        questions.forEach((q, index) => {
+          const questionNum = index + 1;
+          if (answerKey[questionNum] !== undefined) {
+            q.correctAnswer = answerKey[questionNum];
+          }
+        });
+      }
+
       return questions;
     } catch (loi: unknown) {
       const errorMessage = loi instanceof Error ? loi.message : String(loi);
@@ -112,6 +128,15 @@ export class ParserService {
           )
         ) {
           return;
+        }
+
+        // Kiểm tra marker "BẢNG ĐÁP ÁN" để dừng trích xuất câu hỏi
+        if (text.match(/BẢNG\s*ĐÁP\s*ÁN/i)) {
+          if (currentQuestion) {
+            this.finalizeAndPushQuestion(questions, currentQuestion);
+            currentQuestion = null;
+          }
+          return false; // Dừng loop mỗi khi gặp bảng đáp án
         }
 
         // Kiểm tra marker "PHẦN" để ngắt
@@ -395,5 +420,76 @@ export class ParserService {
     });
 
     return hasWmf ? $.html() : html;
+  }
+
+  /**
+   * Trích xuất bảng đáp án từ HTML
+   * Trả về object map STT câu hỏi -> Index đáp án (0-3)
+   */
+  private extractAnswersFromHtml(html: string): Record<number, number> {
+    const $ = cheerio.load(html);
+    const answerKey: Record<number, number> = {};
+
+    const allText = $('body').text();
+
+    // Tìm vị trí của "BẢNG ĐÁP ÁN"
+    const answerSectionMatch = allText.match(/BẢNG\s*ĐÁP\s*ÁN/i);
+    if (!answerSectionMatch) return {};
+
+    // Thử tìm trong các bảng (Table) trước
+    $('table').each((_, table) => {
+      const tableText = $(table).text();
+      if (
+        tableText.match(/Câu/i) &&
+        (tableText.match(/[A-D]/) || tableText.match(/[1-4]/))
+      ) {
+        $(table)
+          .find('tr')
+          .each((_, tr) => {
+            const cells = $(tr).find('td, th');
+            cells.each((i, td) => {
+              const cellText = $(td).text().trim();
+              // Format: "1.A" hoặc "Câu 1: A" hoặc ô STT = 1, ô Đáp án = A
+              const match = cellText.match(/(\d+)[:.\s-]*([A-D])/i);
+              if (match) {
+                const qNum = parseInt(match[1], 10);
+                const ans = match[2].toUpperCase().charCodeAt(0) - 65;
+                answerKey[qNum] = ans;
+              } else {
+                // Check if this cell is a number and next cell is A-D
+                const qNumVal = parseInt(cellText, 10);
+                if (!isNaN(qNumVal)) {
+                  const nextCellText = $(cells[i + 1])
+                    .text()
+                    .trim();
+                  const ansMatch = nextCellText.match(/^[A-D]$/i);
+                  if (ansMatch) {
+                    answerKey[qNumVal] =
+                      ansMatch[0].toUpperCase().charCodeAt(0) - 65;
+                  }
+                }
+              }
+            });
+          });
+      }
+    });
+
+    // Nếu vẫn chưa tìm được hoặc tìm thiếu, thử tìm ở text sau marker "BẢNG ĐÁP ÁN"
+    if (Object.keys(answerKey).length === 0) {
+      const parts = allText.split(/BẢNG\s*ĐÁP\s*ÁN/i);
+      if (parts.length > 1) {
+        const afterMarker = parts[parts.length - 1];
+        // Tìm các cụm 1.A, 2-B, 3 C...
+        const regex = /(\d+)[\s.:-]*([A-D])/gi;
+        let m: RegExpExecArray | null;
+        while ((m = regex.exec(afterMarker)) !== null) {
+          const qNum = parseInt(m[1], 10);
+          const ans = m[2].toUpperCase().charCodeAt(0) - 65;
+          answerKey[qNum] = ans;
+        }
+      }
+    }
+
+    return answerKey;
   }
 }
