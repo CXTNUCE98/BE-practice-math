@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as cheerio from 'cheerio';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 import { v4 as uuidv4 } from 'uuid';
 import { PandocService } from './pandoc.service';
 
@@ -20,10 +21,15 @@ interface ParsedQuestion {
  */
 @Injectable()
 export class ParserService {
-  private readonly tempDuongDan = path.join(process.cwd(), 'temp');
+  // Sử dụng /tmp cho serverless environment (Vercel, AWS Lambda)
+  // hoặc os.tmpdir() cho local development
+  private readonly tempDuongDan =
+    process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
+      ? '/tmp'
+      : path.join(os.tmpdir(), 'practice-math');
 
   constructor(private readonly pandocService: PandocService) {
-    // Tạo thư mục temp nếu chưa tồn tại
+    // Tạo thư mục temp nếu chưa tồn tại (chỉ cần cho local)
     if (!fs.existsSync(this.tempDuongDan)) {
       fs.mkdirSync(this.tempDuongDan, { recursive: true });
     }
