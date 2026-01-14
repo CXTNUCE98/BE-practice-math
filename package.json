@@ -15,7 +15,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && nest build"
+    "vercel-build": "sh scripts/vercel-build.sh"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
