@@ -137,4 +137,24 @@ export class ExamController {
   ): Promise<any> {
     return this.examService.submitExam(req.user.userId, examId, answers);
   }
+
+  /**
+   * Debug endpoint to check latest exam
+   */
+  @Get('debug/latest')
+  @ApiOperation({ summary: 'Debug: Check latest exam data' })
+  async debugLatestExam(): Promise<any> {
+    const exams = await this.examService.findAll();
+    if (exams.length === 0) {
+      return { message: 'No exams found' };
+    }
+    const latest = exams[0];
+    const full = await this.examService.findOne(latest.id);
+    return {
+      id: full.id,
+      title: full.title,
+      questionCount: full.questions?.length || 0,
+      sampleQuestion: full.questions?.[0] || null,
+    };
+  }
 }

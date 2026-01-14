@@ -28,11 +28,12 @@
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
     "bcrypt": "^6.0.0",
+    "canvas": "^3.2.1",
+    "cheerio": "^1.1.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "dotenv": "^16.4.7",
     "express": "^5.2.1",
-    "mammoth": "^1.11.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.16.3",
@@ -40,7 +41,9 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "swagger-ui-dist": "^5.31.0",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^9.0.0",
+    "wmf": "^1.0.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -57,6 +60,7 @@
     "@types/passport-jwt": "^4.0.1",
     "@types/pg": "^8.16.0",
     "@types/supertest": "^6.0.2",
+    "@types/uuid": "^9.0.0",
     "@vercel/node": "^5.5.17",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
