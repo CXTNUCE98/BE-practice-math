@@ -11,10 +11,6 @@
     "api/**/*.ts": {
       "includeFiles": "dist/bin/**",
       "maxDuration": 60
-    },
-    "api/**/*.js": {
-      "includeFiles": "dist/bin/**",
-      "maxDuration": 60
     }
   }
 }
