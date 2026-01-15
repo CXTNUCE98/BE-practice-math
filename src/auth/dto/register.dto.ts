@@ -43,7 +43,6 @@ export class RegisterDto {
     required: false,
   })
   @IsString({ message: 'Lớp phải là chuỗi' })
-  @IsNotEmpty({ message: 'Lớp không được để trống' })
   @IsOptional()
   className?: string;
 }
