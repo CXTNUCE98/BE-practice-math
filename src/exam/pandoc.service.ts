@@ -3,6 +3,7 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 import * as path from 'path';
 import * as cheerio from 'cheerio';
+import * as fs from 'fs';
 
 const exec = promisify(execFile);
 
@@ -19,12 +20,41 @@ export class PandocService {
   async chuyenDoiDocxSangHtml(duongDanFile: string): Promise<string> {
     try {
       // Gọi Pandoc CLI với các options:
-      // -t html: output format là HTML
-      // --mathjax: convert math equations sang LaTeX format
-      // --wrap=none: không wrap lines (giữ nguyên formatting)
       const pandocPath = process.env.VERCEL
         ? path.join(process.cwd(), 'dist/bin/pandoc')
         : 'pandoc';
+
+      console.log(`[PANDOC DEBUG] Env VERCEL: ${process.env.VERCEL}`);
+      console.log(`[PANDOC DEBUG] CWD: ${process.cwd()}`);
+      console.log(`[PANDOC DEBUG] Target Path: ${pandocPath}`);
+
+      if (process.env.VERCEL) {
+        if (fs.existsSync(pandocPath)) {
+          console.log('[PANDOC DEBUG] Binary exists at path.');
+          try {
+            await fs.promises.access(pandocPath, fs.constants.X_OK);
+            console.log('[PANDOC DEBUG] Binary is executable.');
+          } catch (e) {
+            console.log(
+              '[PANDOC DEBUG] Binary is NOT executable (access X_OK failed):',
+              e.message,
+            );
+          }
+        } else {
+          console.log('[PANDOC DEBUG] Binary DOES NOT exist at path.');
+          // List dist/bin contents
+          const binDir = path.dirname(pandocPath);
+          if (fs.existsSync(binDir)) {
+            console.log(
+              `[PANDOC DEBUG] Listing ${binDir}:`,
+              fs.readdirSync(binDir),
+            );
+          } else {
+            console.log(`[PANDOC DEBUG] Directory ${binDir} does not exist.`);
+          }
+        }
+      }
+
       const { stdout } = await exec(
         pandocPath,
         [

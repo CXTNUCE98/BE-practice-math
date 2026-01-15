@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Backend cho ứng dụng luyện thi toán học",
   "scripts": {
-    "build": "prisma generate && nest build",
+    "build": "npm run vercel-build",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "nest start",
     "dev": "nest start --watch",
