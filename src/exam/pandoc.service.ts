@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import * as path from 'path';
 import * as cheerio from 'cheerio';
 
 const exec = promisify(execFile);
@@ -21,8 +22,11 @@ export class PandocService {
       // -t html: output format là HTML
       // --mathjax: convert math equations sang LaTeX format
       // --wrap=none: không wrap lines (giữ nguyên formatting)
+      const pandocPath = process.env.VERCEL
+        ? path.join(process.cwd(), 'dist/bin/pandoc')
+        : 'pandoc';
       const { stdout } = await exec(
-        'pandoc',
+        pandocPath,
         [
           duongDanFile,
           '-t',
