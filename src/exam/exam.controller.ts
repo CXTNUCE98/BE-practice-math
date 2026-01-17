@@ -9,6 +9,8 @@ import {
   Body,
   UseGuards,
   Req,
+  Query,
+  Patch,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -59,6 +61,10 @@ export class ExamController {
           example: '90',
           description: 'Thời gian làm bài (phút)',
         },
+        categoryId: {
+          type: 'string',
+          description: 'ID danh mục (Optional)',
+        },
       },
       required: ['file', 'title', 'duration'],
     },
@@ -71,11 +77,13 @@ export class ExamController {
     @UploadedFile() file: Express.Multer.File,
     @Body('title') title: string,
     @Body('duration') duration: string,
+    @Body('categoryId') categoryId?: string,
   ): Promise<any> {
     return this.examService.createFromDocx(
       file.buffer,
       title,
       parseInt(duration, 10),
+      categoryId,
     );
   }
 
@@ -86,8 +94,8 @@ export class ExamController {
   @ApiOperation({ summary: 'Lấy tất cả danh sách đề thi' })
   @ApiResponse({ status: 200, description: 'Danh sách đề thi' })
   @UseGuards(JwtAuthGuard)
-  async getAllExams(): Promise<any[]> {
-    return this.examService.findAll();
+  async getAllExams(@Query('categoryId') categoryId?: string): Promise<any[]> {
+    return this.examService.findAll(categoryId);
   }
 
   /**
@@ -151,6 +159,32 @@ export class ExamController {
     @Param('id') resultId: string,
   ): Promise<any> {
     return this.examService.getResult(resultId, req.user.userId);
+  }
+
+  /**
+   * Cập nhật thông tin đề thi (Chỉ dành cho Admin)
+   */
+  @Patch(':id')
+  @ApiOperation({ summary: 'Cập nhật thông tin đề thi' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+        duration: { type: 'number' },
+        categoryId: { type: 'string' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Đề thi đã được cập nhật' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  async updateExam(
+    @Param('id') id: string,
+    @Body()
+    updateData: { title?: string; duration?: number; categoryId?: string },
+  ): Promise<any> {
+    return this.examService.update(id, updateData);
   }
 
   /**

@@ -35,7 +35,20 @@ model Exam {
   updatedAt   DateTime   @updatedAt
   questions   Question[]
   results     Result[]
+  categoryId  String?
+  category    Category?  @relation(fields: [categoryId], references: [id])
   @@map("exams")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  exams       Exam[]
+  @@map("categories")
 }
 
 model Question {

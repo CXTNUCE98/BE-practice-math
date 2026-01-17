@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { ExamModule } from './exam/exam.module';
 
 import { UserModule } from './user/user.module';
+import { CategoryModule } from './category/category.module';
 
 /**
  * Module gốc của ứng dụng, kết nối tất cả các thành phần lại với nhau
@@ -20,6 +21,7 @@ import { UserModule } from './user/user.module';
     AuthModule,
     ExamModule,
     UserModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

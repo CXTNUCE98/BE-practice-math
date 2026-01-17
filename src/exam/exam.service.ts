@@ -19,6 +19,7 @@ export class ExamService {
     fileBuffer: Buffer,
     title: string,
     duration: number,
+    categoryId?: string,
   ): Promise<any> {
     const parsedQuestions = await this.parserService.parseDocx(fileBuffer);
 
@@ -33,6 +34,7 @@ export class ExamService {
             correctAnswer: q.correctAnswer,
           })),
         },
+        categoryId,
       },
       include: { questions: true },
     });
@@ -43,9 +45,13 @@ export class ExamService {
   /**
    * Lấy danh sách tất cả đề thi
    */
-  async findAll(): Promise<any[]> {
+  async findAll(categoryId?: string): Promise<any[]> {
     return this.prisma.exam.findMany({
+      where: categoryId ? { categoryId } : {},
       orderBy: { createdAt: 'desc' },
+      include: {
+        category: true,
+      },
     });
   }
 
@@ -133,11 +139,72 @@ export class ExamService {
   }
 
   /**
+   * Cập nhật thông tin đề thi
+   */
+  async update(
+    id: string,
+    data: { title?: string; duration?: number; categoryId?: string },
+  ): Promise<any> {
+    await this.findOne(id);
+    return this.prisma.exam.update({
+      where: { id },
+      data,
+    });
+  }
+
+  /**
    * Xóa đề thi
    */
   async remove(id: string): Promise<any> {
     await this.findOne(id);
     return this.prisma.exam.delete({
+      where: { id },
+    });
+  }
+
+  /**
+   * Thêm câu hỏi vào đề thi
+   */
+  async addQuestion(
+    examId: string,
+    data: {
+      content: string;
+      options: string[];
+      correctAnswer: number;
+      explanation?: string;
+    },
+  ): Promise<any> {
+    return this.prisma.question.create({
+      data: {
+        ...data,
+        examId,
+      },
+    });
+  }
+
+  /**
+   * Cập nhật câu hỏi
+   */
+  async updateQuestion(
+    id: string,
+    data: {
+      content?: string;
+      options?: string[];
+      correctAnswer?: number;
+      explanation?: string;
+    },
+  ): Promise<any> {
+    return this.prisma.question.update({
+      where: { id },
+      data,
+    });
+  }
+
+  /**
+   * Xóa câu hỏi
+   */
+  async deleteQuestion(id: string): Promise<any> {
+    return this.prisma.question.delete({
       where: { id },
     });
   }
