@@ -61,7 +61,11 @@ export class ExamService {
   async findOne(id: string): Promise<any> {
     const exam = await this.prisma.exam.findUnique({
       where: { id },
-      include: { questions: true },
+      include: {
+        questions: {
+          orderBy: { id: 'asc' },
+        },
+      },
     });
 
     if (!exam) {
@@ -121,7 +125,9 @@ export class ExamService {
       include: {
         exam: {
           include: {
-            questions: true,
+            questions: {
+              orderBy: { id: 'asc' },
+            },
           },
         },
       },
