@@ -17,6 +17,7 @@ import { ExamService } from './exam.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CreateQuestionDto, UpdateQuestionDto } from './dto/question.dto';
 
 @ApiTags('Quản lý Câu hỏi (Questions)')
 @ApiBearerAuth()
@@ -31,13 +32,7 @@ export class QuestionController {
   @ApiResponse({ status: 201, description: 'Câu hỏi đã được tạo' })
   async addQuestion(
     @Param('examId') examId: string,
-    @Body()
-    data: {
-      content: string;
-      options: string[];
-      correctAnswer: number;
-      explanation?: string;
-    },
+    @Body() data: CreateQuestionDto,
   ) {
     return this.examService.addQuestion(examId, data);
   }
@@ -47,13 +42,7 @@ export class QuestionController {
   @ApiResponse({ status: 200, description: 'Câu hỏi đã được cập nhật' })
   async updateQuestion(
     @Param('id') id: string,
-    @Body()
-    data: {
-      content?: string;
-      options?: string[];
-      correctAnswer?: number;
-      explanation?: string;
-    },
+    @Body() data: UpdateQuestionDto,
   ) {
     return this.examService.updateQuestion(id, data);
   }
